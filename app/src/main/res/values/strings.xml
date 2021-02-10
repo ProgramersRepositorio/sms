@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">sms</string>
+    <string name="_telefono">666109294</string>
+    <string name="botonsms">botonSMS</string>
+    <string name="prueba_de_sms">Prueba de SMS</string>
+</resources>
