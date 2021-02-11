@@ -5,7 +5,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.view.View;
@@ -14,8 +17,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
-        ImageButton btnEnviar;
-        TextView txtTelefono, txtMensaje;
+    ImageButton btnEnviar;
+    TextView txtTelefono, txtLatitud, txtLongitud, txtPrecision, txtAltura;
+    LocationManager localizador;
+    Location localizacion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,12 +29,25 @@ public class MainActivity extends AppCompatActivity {
 
         btnEnviar = findViewById(R.id.buttonEnviarSms);
         txtTelefono = findViewById(R.id.textTelefono);
-        txtMensaje = findViewById(R.id.textMensaje);
+        txtLatitud = findViewById(R.id.textLatitud);
+        txtLongitud = findViewById(R.id.textLongitud);
+        txtPrecision = findViewById(R.id.textPrecision);
+        txtAltura = findViewById(R.id.textAltitud);
 
+        //comprobamos si tenemos los permisos necesarios
+
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
 
         if(ActivityCompat.checkSelfPermission(
                 MainActivity.this, Manifest.permission.SEND_SMS)
-                != PackageManager.PERMISSION_GRANTED&& ActivityCompat.checkSelfPermission(
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
                 MainActivity.this,Manifest
                         .permission.SEND_SMS)!= PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(MainActivity.this,new String[]
@@ -39,7 +57,9 @@ public class MainActivity extends AppCompatActivity {
         btnEnviar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                enviarMensaje(txtTelefono.getText().toString(), txtMensaje.getText().toString());
+
+                String mensaje = obtenerLocalizacion();
+                enviarMensaje(txtTelefono.getText().toString(),mensaje);
             }
         });
     }
@@ -54,5 +74,31 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+    }
+
+    private String obtenerLocalizacion() {
+        String texto ="";
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(MainActivity.this,
+                    "No tiene los permisos necesarios",
+                    Toast.LENGTH_SHORT);
+            //return;
+        }
+        localizador = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        localizacion = localizador.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+        txtLatitud.setText(String.valueOf(localizacion.getLatitude()));
+        txtLongitud.setText(String.valueOf(localizacion.getLongitude()));
+        txtPrecision.setText(String.valueOf(localizacion.getAccuracy()));
+        txtAltura.setText(String.valueOf(localizacion.getAltitude()));
+
+        texto = "Latitud: "+txtLatitud.getText().toString()+", Longitud: "+txtLongitud.getText().toString()+
+                ",Altitud: "+ txtAltura.getText()+"Precision: "+txtPrecision.getText();
+
+        return texto;
     }
 }

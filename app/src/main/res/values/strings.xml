@@ -3,4 +3,8 @@
     <string name="_telefono">666109294</string>
     <string name="botonsms">botonSMS</string>
     <string name="prueba_de_sms">Prueba de SMS</string>
+    <string name="latitud">Latitud:</string>
+    <string name="longitud">Longitud:</string>
+    <string name="precision">Precision:</string>
+    <string name="altitud">Altitud:</string>
 </resources>
